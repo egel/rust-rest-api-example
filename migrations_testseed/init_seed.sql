@@ -1,0 +1,52 @@
+-- Seed data for local development and testing.
+-- Re-runnable: wipes existing rows, then inserts fresh examples.
+-- IDs are left to all-defaults so uuidv7() generates them.
+
+TRUNCATE TABLE tasks;
+
+INSERT INTO tasks (name, done, created_at, updated_at, deleted_at)
+VALUES
+    -- Brand new, nothing done yet, never updated.
+    (
+        'Set up project skeleton',
+        false,
+        now() - interval '5 days',
+        NULL,
+        NULL
+    ),
+
+    -- Completed.
+    (
+        'Set up PostgreSQL',
+        true,
+        now() - interval '4 days',
+        now() - interval '4 days',
+        NULL
+    ),
+
+    -- In progress: created earlier, updated recently.
+    (
+        'Design REST endpoints',
+        false,
+        now() - interval '3 days',
+        now() - interval '1 hour',
+        NULL
+    ),
+
+    -- Not touched for a while, still open.
+    (
+        'Write integration tests',
+        false,
+        now() - interval '2 days',
+        NULL,
+        NULL
+    ),
+
+    -- Soft-deleted: kept for audit, but filtered out by queries.
+    (
+        'Draft architecture sketch',
+        true,
+        now() - interval '6 days',
+        now() - interval '5 days',
+        now() - interval '1 day'
+    );

@@ -13,6 +13,12 @@ SERVER_ENVIRONMENT=develop cargo run
 
 ## Development
 
+How to fill db with init seed?
+
+```sh
+./scripts/seed.sh
+```
+
 How to delete database?
 
 ```sh
