@@ -23,6 +23,5 @@ How to delete database?
 
 ```sh
 docker compose exec -T database psql -U admin -d postgres \
-  -c "DROP DATABASE rust_rest_api WITH (FORCE);" \
-  -c "CREATE DATABASE rust_rest_api;"
+  -c "DROP DATABASE rust_rest_api WITH (FORCE);"
 ```

@@ -4,12 +4,13 @@
 
 TRUNCATE TABLE tasks;
 
-INSERT INTO tasks (name, done, created_at, updated_at, deleted_at)
+INSERT INTO tasks (name, is_done, due_date, created_at, updated_at, deleted_at)
 VALUES
     -- Brand new, nothing done yet, never updated.
     (
         'Set up project skeleton',
         false,
+        NULL,
         now() - interval '5 days',
         NULL,
         NULL
@@ -19,6 +20,7 @@ VALUES
     (
         'Set up PostgreSQL',
         true,
+        NULL,
         now() - interval '4 days',
         now() - interval '4 days',
         NULL
@@ -28,6 +30,7 @@ VALUES
     (
         'Design REST endpoints',
         false,
+        NULL,
         now() - interval '3 days',
         now() - interval '1 hour',
         NULL
@@ -37,6 +40,7 @@ VALUES
     (
         'Write integration tests',
         false,
+        NULL,
         now() - interval '2 days',
         NULL,
         NULL
@@ -46,6 +50,7 @@ VALUES
     (
         'Draft architecture sketch',
         true,
+        NULL,
         now() - interval '6 days',
         now() - interval '5 days',
         now() - interval '1 day'

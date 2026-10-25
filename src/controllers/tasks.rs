@@ -18,7 +18,7 @@ pub async fn tasks_list(
     State(pool): State<PgPool>,
     Query(params): Query<HashMap<String, String>>,
 ) -> ApiResult<Json<Vec<Task>>> {
-    let done = match params.get("done") {
+    let done = match params.get("is_done") {
         Some(value) => match value.parse::<bool>() {
             Ok(done) => Some(done),
             Err(_) => {

@@ -7,7 +7,8 @@ use uuid::Uuid;
 pub struct Task {
     pub id: Uuid,
     pub name: String,
-    pub done: bool,
+    pub is_done: bool,
+    pub due_date: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
     pub updated_at: Option<DateTime<Utc>>,
     pub deleted_at: Option<DateTime<Utc>>,
