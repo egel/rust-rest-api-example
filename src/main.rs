@@ -1,8 +1,10 @@
 mod controllers;
+mod db;
 mod envs;
 mod logging;
 mod migrations;
 mod models;
+mod repositories;
 mod router;
 
 use tracing::info;
@@ -20,7 +22,12 @@ async fn main() {
     migrations.expect("database migrations failed");
     info!("database migrations applied");
 
-    let app = router::create_router();
+    let pool = db::connect(envs::database_url())
+        .await
+        .expect("database pool failed");
+    info!("database pool connected");
+
+    let app = router::create_router(pool);
     let address: String = format!("{}:{}", envs::host(), envs::port()).to_string();
     let listener = tokio::net::TcpListener::bind(&address).await.unwrap();
 

@@ -7,9 +7,16 @@ cp .env.example .env
 # start infra
 docker compose up -d
 
-# build project
-cargo build
+# build and run project (in development)
+SERVER_ENVIRONMENT=develop cargo run
+```
 
-# run project
-cargo run
+## Development
+
+How to delete database?
+
+```sh
+docker compose exec -T database psql -U admin -d postgres \
+  -c "DROP DATABASE rust_rest_api WITH (FORCE);" \
+  -c "CREATE DATABASE rust_rest_api;"
 ```

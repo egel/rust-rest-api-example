@@ -1,4 +1,3 @@
-use dotenvy;
 use std::env;
 
 /// Name of the environment variable holding the database connection URL.
@@ -52,7 +51,7 @@ pub fn load_dotenv() {
 ///
 /// Panics at startup when the variable is not set.
 pub fn database_url() -> String {
-    env::var(DATABASE_URL_KEY).expect(missing(DATABASE_URL_KEY).as_str())
+    env::var(DATABASE_URL_KEY).unwrap_or_else(|_| panic!("{}", missing(DATABASE_URL_KEY)))
 }
 
 /// Application environment name.
@@ -60,15 +59,15 @@ pub fn database_url() -> String {
 /// Returns one of [`ENVIRONMENT_OPTIONS`]; when the variable is not set,
 /// defaults to `develop`.
 pub fn environment() -> String {
-    current_environment().expect(missing(ENVIRONMENT_KEY).as_str())
+    current_environment().unwrap_or_else(|| panic!("{}", missing(ENVIRONMENT_KEY)))
 }
 
 /// Server hostname
 pub fn host() -> String {
-    env::var(HOST_KEY).expect(missing(HOST_KEY).as_str())
+    env::var(HOST_KEY).unwrap_or_else(|_| panic!("{}", missing(HOST_KEY)))
 }
 
 /// Server port
 pub fn port() -> String {
-    env::var(PORT_KEY).expect(missing(PORT_KEY).as_str())
+    env::var(PORT_KEY).unwrap_or_else(|_| panic!("{}", missing(PORT_KEY)))
 }
