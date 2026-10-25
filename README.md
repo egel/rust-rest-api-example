@@ -1,7 +1,13 @@
 # Rust REST API example
 
 ```sh
-# building project
+# copy variables example and adjust
+cp .env.example .env
+
+# start infra
+docker compose up -d
+
+# build project
 cargo build
 
 # run project
