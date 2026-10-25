@@ -13,15 +13,23 @@ SERVER_ENVIRONMENT=develop cargo run
 
 ## Development
 
-How to fill db with init seed?
+1.  How to delete database?
 
-```sh
-./scripts/seed.sh
-```
+    ```sh
+    docker compose exec -T database psql -U admin -d postgres \
+        -c "DROP DATABASE IF EXISTS rust_rest_api WITH (FORCE);" \
+        -c "CREATE DATABASE rust_rest_api;"
+    ```
 
-How to delete database?
+2.  Start server (with migrations)
 
-```sh
-docker compose exec -T database psql -U admin -d postgres \
-  -c "DROP DATABASE rust_rest_api WITH (FORCE);"
-```
+    ```sh
+    # build and run project (in development)
+    SERVER_ENVIRONMENT=develop cargo run
+    ```
+
+3.  How to fill db with init seed?
+
+    ```sh
+    ./scripts/seed.sh
+    ```
