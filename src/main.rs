@@ -1,21 +1,16 @@
-use axum::{Router, routing::get};
-
 mod controllers;
+mod envs;
+mod migrations;
+mod models;
+mod router;
 
 #[tokio::main]
 async fn main() {
-    // vars
-    let address: String = "0.0.0.0:8000".to_string();
+    envs::load_dotenv();
+    migrations::start_migrations().expect("database migrations failed");
 
-    let app = Router::new()
-        .route("/", get(controllers::root))
-        .route("/health", get(controllers::health))
-        .route(
-            "/tasks",
-            get(controllers::tasks_list).post(controllers::task_create),
-        )
-        .route("/tasks/{id}", get(controllers::task_info));
-
+    let app = router::create_router();
+    let address: String = format!("{}:{}", envs::host(), envs::port()).to_string();
     let listener = tokio::net::TcpListener::bind(&address).await.unwrap();
 
     println!("Server started on {}", &address);
