@@ -1,30 +1,4 @@
-use axum::extract::{Path, Query};
-use std::collections::HashMap;
-
-fn slow_hello() -> String {
-    "hello from slow function".to_string()
-}
-
-pub async fn root() -> &'static str {
-    "task root"
-}
-
-pub async fn health() -> String {
-    "ok".to_string()
-}
-
-pub async fn tasks_list(Query(params): Query<HashMap<String, String>>) -> String {
-    let filters = params
-        .get("done")
-        .map_or("everything".to_string(), |x| format!("done={}", x));
-
-    format!("listing tasks, filter: {}", filters)
-}
-
-pub async fn task_create() -> &'static str {
-    "task created"
-}
-
-pub async fn task_info(Path(id): Path<String>) -> &'static str {
-    "task info"
-}
+//! HTTP API handlers, split per feature.
+pub mod health;
+pub mod root;
+pub mod tasks;
