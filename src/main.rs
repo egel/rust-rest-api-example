@@ -7,7 +7,11 @@ mod router;
 #[tokio::main]
 async fn main() {
     envs::load_dotenv();
-    migrations::start_migrations().expect("database migrations failed");
+
+    let migrations = tokio::task::spawn_blocking(migrations::start_migrations)
+        .await
+        .expect("migrations task failed");
+    migrations.expect("database migrations failed");
 
     let app = router::create_router();
     let address: String = format!("{}:{}", envs::host(), envs::port()).to_string();

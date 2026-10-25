@@ -3,5 +3,5 @@ CREATE TABLE IF NOT EXISTS tasks (
     name varchar(255) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ,
-    deleted_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
 );
