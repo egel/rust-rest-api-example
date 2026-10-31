@@ -6,15 +6,27 @@
 - Verify changes: `cargo fmt --check && cargo clippy && cargo test` (no tests exist yet, but run it anyway)
 - Rust edition 2024 — requires a recent stable toolchain (1.85+).
 
+## Configuration & running
+
+- Environment variables (all required): `SERVER_DATABASE_URL`, `SERVER_ENVIRONMENT`, `SERVER_HOST`, `SERVER_PORT`.
+- `SERVER_ENVIRONMENT` must be one of `develop`, `production`, `testing`. A `.env` file is loaded only when the environment is `develop`; for other environments provide real variables.
+- A reachable Postgres is required at startup: refinery migrations apply automatically, then sqlx connects the pool.
+- SQL is compile-time checked (`sqlx::query_as!`): building the crate (including tests) needs a reachable `DATABASE_URL` or offline `.sqlx` metadata via `cargo sqlx prepare`.
+
 ## State of the project
 
-- Single-crate Actix Web 4 API example, still a skeleton: `src/main.rs` only prints a line; no routes, no tests, no CI yet. Expect to wire things up rather than extend them.
-- The crate name is `Rust_REST_API_example` (mixed case) — binary/artifact names reflect it.
+- Single-crate Axum 0.8 (not Actix) REST API for tasks, wired and running: controllers (HTTP handlers) → repositories (SQL) → models (`src/models/task.rs`).
+- Routes (`src/router.rs`): `GET /`, `GET /health`, `GET+POST /tasks`, `GET+DELETE /tasks/{id}`. Tasks support an `is_done` filter param; deletes are soft (stamped `deleted_at`, excluded from queries).
+- Migrations via refinery, embedded from `./migrations` (refinery naming, e.g. `V1__init.sql`).
+- Observability: `tower-http` TraceLayer, `tracing-subscriber` (JSON).
+- Crate is binary-only: modules are declared in `src/main.rs`, so nothing is importable from `tests/` yet. Adding integration tests requires a lib/bin split (`src/lib.rs` + thin `src/main.rs`).
+- No tests, no CI yet.
+- The crate name is `rust_rest_api_example` (snake case) — binary/artifact names reflect it.
 
 ## Protocol buffers
 
-- `proto` defines the `Task` message (id, name, timestamps via `google.protobuf.Timestamp`), but codegen is NOT wired: no `prost`/`tonic` deps and no `build.rs` yet. Don't assume generated Rust types exist.
-- If adding codegen, follow the standard `build.rs` + `prost-build` setup and generate into `target/` or an OUT_DIR — don't hand-edit generated files.
+- `proto/api/v1/task.proto` defines the `Task` message (id, name, timestamps via `google.protobuf.Timestamp`), but codegen is NOT wired and no generated code is used. Caveats: provisioning for it exists (`tonic`/`prost`/`tonic-prost-build` dependencies, a `[build-dependencies]` entry) and a script was written to `src/build.rs` — wrong location (Cargo expects `build.rs` at the package root or `build = "src/build.rs"` in Cargo.toml) and currently declared as an unused `mod build` in `main.rs`, so it never runs. It also calls an older `.compile_protos` API; expect to fix it, not trust it.
+- If wiring codegen: move the script to `build.rs`, use the current `tonic-prost-build`/`prost-build` API, generate into `OUT_DIR`/`target` — don't hand-edit generated files.
 
 ## Docs
 
