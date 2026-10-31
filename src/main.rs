@@ -1,14 +1,9 @@
-mod controllers;
-mod db;
-mod envs;
-mod logging;
-mod migrations;
-mod models;
-mod repositories;
-mod router;
-mod build;
+//! Binary entry point. All application modules live in the library crate and
+//! are exposed via `rust_rest_api_example::…` — see `src/lib.rs`.
 
 use tracing::info;
+
+use rust_rest_api_example::{db, envs, logging, migrations, router};
 
 #[tokio::main]
 async fn main() {

@@ -22,5 +22,16 @@ tonic = "0.14.7"
 prost = "0.14.4"
 tonic-prost-build = "0.14.7"
 
+[dev-dependencies]
+tower = { version = "0.5.3", features = ["util"] }
+
+[[test]]
+# Directory-style integration test binary: `tests/api/main.rs` + modules beside it.
+name = "api"
+path = "tests/api/main.rs"
+# `main.rs`-entry test targets default to `harness = false`; we need it on so
+# the `#[tokio::test]` fns in `mod tasks` are collected individually.
+harness = true
+
 [build-dependencies]
 tonic-prost-build = "0.14.7"

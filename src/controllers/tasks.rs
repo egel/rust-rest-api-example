@@ -13,12 +13,14 @@ use crate::repositories;
 /// Type alias for handler results carrying an HTTP error status.
 type ApiResult<T> = Result<T, (StatusCode, &'static str)>;
 
+const QUERY_PARAM_IS_DONE: &str = "is_done";
+
 /// `GET /tasks?done=<bool>` - lists tasks, optionally filtered by the `done` flag.
 pub async fn tasks_list(
     State(pool): State<PgPool>,
     Query(params): Query<HashMap<String, String>>,
 ) -> ApiResult<Json<Vec<Task>>> {
-    let done = match params.get("is_done") {
+    let done = match params.get(QUERY_PARAM_IS_DONE) {
         Some(value) => match value.parse::<bool>() {
             Ok(done) => Some(done),
             Err(_) => {

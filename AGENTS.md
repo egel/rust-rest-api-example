@@ -3,7 +3,9 @@
 ## Commands
 
 - Build: `cargo build`; Run: `cargo run`
-- Verify changes: `cargo fmt --check && cargo clippy && cargo test` (no tests exist yet, but run it anyway)
+- Verify changes: `cargo fmt --check && cargo clippy && cargo test`
+- Run API tests only: `cargo test --test api`
+- Tests need env vars exported first (`set -a; source .env; set +a`): `DATABASE_URL` is required at build time by the compile-time checked queries, `SERVER_DATABASE_URL` is used by the tests. The test Postgres must already have migrations applied.
 - Rust edition 2024 — requires a recent stable toolchain (1.85+).
 
 ## Configuration & running
@@ -19,8 +21,8 @@
 - Routes (`src/router.rs`): `GET /`, `GET /health`, `GET+POST /tasks`, `GET+DELETE /tasks/{id}`. Tasks support an `is_done` filter param; deletes are soft (stamped `deleted_at`, excluded from queries).
 - Migrations via refinery, embedded from `./migrations` (refinery naming, e.g. `V1__init.sql`).
 - Observability: `tower-http` TraceLayer, `tracing-subscriber` (JSON).
-- Crate is binary-only: modules are declared in `src/main.rs`, so nothing is importable from `tests/` yet. Adding integration tests requires a lib/bin split (`src/lib.rs` + thin `src/main.rs`).
-- No tests, no CI yet.
+- Lib/bin split is done: `src/lib.rs` exposes the modules as `pub mod`; `src/main.rs` is a thin entry point calling into the library. Integration tests under `tests/` import via `rust_rest_api_example::…`.
+- API tests live in `tests/api/` (directory-style test target `api`, `tests/api/main.rs` + one file per feature, declared as `mod`s in `main.rs`; `harness = true` is set explicitly in Cargo.toml). Unit tests: inline `#[cfg(test)] mod tests` in the source files. No CI yet.
 - The crate name is `rust_rest_api_example` (snake case) — binary/artifact names reflect it.
 
 ## Protocol buffers

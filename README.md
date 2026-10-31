@@ -36,3 +36,11 @@ SERVER_ENVIRONMENT=develop cargo run
     ```sh
     ./scripts/seed.sh
     ```
+    
+### Testing
+
+Test API locally against local database. Before running init the database with sample seed.
+
+```sh
+SERVER_ENVIRONMENT=develop cargo test
+```
