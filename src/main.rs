@@ -6,6 +6,7 @@ mod migrations;
 mod models;
 mod repositories;
 mod router;
+mod build;
 
 use tracing::info;
 

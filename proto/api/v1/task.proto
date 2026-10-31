@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package task;
+
+service TaskService {
+  rpc Create(TaskCreateRequest) returns (TaskCreateResponse);
+}
+
+// definition of Task
+message Task {
+  string id = 1;
+  string name = 2;
+  bool is_done = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+  google.protobuf.Timestamp deleted_at = 6;
+}
+
+message TaskCreateRequest {
+  string name = 2;
+}
+
+message TaskCreateResponse {
+  Task task = 1;
+}

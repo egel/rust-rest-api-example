@@ -13,7 +13,7 @@
 
 ## Protocol buffers
 
-- `protobuf/task.proto` defines the `Task` message (id, name, timestamps via `google.protobuf.Timestamp`), but codegen is NOT wired: no `prost`/`tonic` deps and no `build.rs` yet. Don't assume generated Rust types exist.
+- `proto` defines the `Task` message (id, name, timestamps via `google.protobuf.Timestamp`), but codegen is NOT wired: no `prost`/`tonic` deps and no `build.rs` yet. Don't assume generated Rust types exist.
 - If adding codegen, follow the standard `build.rs` + `prost-build` setup and generate into `target/` or an OUT_DIR — don't hand-edit generated files.
 
 ## Docs

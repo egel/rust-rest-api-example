@@ -7,7 +7,10 @@ cp .env.example .env
 # start infra
 docker compose up -d
 
-# build and run project (in development)
+# build project and dependencies
+cargo build
+
+# and run project (in development)
 SERVER_ENVIRONMENT=develop cargo run
 ```
 
