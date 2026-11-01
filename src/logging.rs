@@ -9,7 +9,6 @@
 //! as `RUST_LOG` (e.g. `SERVER_LOG_LEVEL=info,Rust_REST_API_example=trace`).
 
 use std::env;
-use postgres::fallible_iterator::FallibleIterator;
 use tracing_subscriber::{
     filter::EnvFilter,
     fmt,
@@ -29,7 +28,7 @@ const DEVELOP_ENVIRONMENT: &str = "develop";
 /// Default trace filter directives per application environment.
 fn default_directives() -> String {
     match envs::environment().as_str() {
-        DEVELOP_ENVIRONMENT => "info,Rust_REST_API_example=debug",
+        DEVELOP_ENVIRONMENT => "info,rust_rest_api_example=debug",
         _ => "info",
     }
     .to_string()

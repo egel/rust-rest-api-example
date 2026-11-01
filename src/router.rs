@@ -1,7 +1,7 @@
-use axum::{Router, routing::get, http::Request,};
+use axum::{Router, body::Body, http::Request, routing::get};
 use sqlx::PgPool;
-use tower_http::trace::{DefaultMakeSpan, DefaultOnResponse, TraceLayer};
-use tracing::{info, Level, Span};
+use tower_http::trace::{DefaultOnResponse, TraceLayer};
+use tracing::{Level, Span};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -29,7 +29,7 @@ fn requests_span(request: &Request<Body>) -> Span {
         method = %request.method(),
         path = %request.uri().path(),
         request_id = %request_id,
-    );
+    )
 }
 
 pub fn create_router(pool: PgPool) -> Router {
