@@ -14,6 +14,13 @@ cargo build
 SERVER_ENVIRONMENT=develop cargo run
 ```
 
+> [TIP]
+> If `SERVER_ENVIRONMENT=develop` it will automatically load `.env` file.
+
+- Swagger UI: <http://localhost:8000/swagger-ui>
+- Raw OpenAPI spec: <http://localhost:8000/api-docs/v1/openapi.json>
+- The API itself (example): <http://localhost:8000/tasks>
+
 ## Development
 
 1.  How to delete database?

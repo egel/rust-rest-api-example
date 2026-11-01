@@ -6,18 +6,24 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::controllers::{health, root, tasks};
+use crate::models::task::{CreateTask, Task};
 
 /// Builds the application router with a database pool shared across handlers.
 #[derive(OpenApi)]
 #[openapi(
     info(title = "Making API", version = "0.0.1"),
-    paths(tasks::tasks_list, tasks::task_create, tasks::tasks_update, tasks::tasks_delete),
-    components(schemas(Task)),
+    paths(
+        tasks::tasks_list,
+        tasks::task_create,
+        tasks::task_info,
+        tasks::task_delete,
+    ),
+    components(schemas(Task, CreateTask))
 )]
 struct ApiDocs;
 
 pub fn create_router(pool: PgPool) -> Router {
-    let openapi = OpenApi::openapi();
+    let openapi = ApiDocs::openapi();
     Router::new()
         .route("/", get(root::root))
         .route("/health", get(health::health))

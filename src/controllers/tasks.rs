@@ -1,11 +1,9 @@
-use std::collections::HashMap;
-
 use axum::Json;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use serde::Deserialize;
 use sqlx::PgPool;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use utoipa::IntoParams;
 use uuid::Uuid;
 
@@ -15,8 +13,6 @@ use crate::repositories;
 /// Type alias for handler results carrying an HTTP error status.
 type ApiResult<T> = Result<T, (StatusCode, &'static str)>;
 
-const QUERY_PARAM_IS_DONE: &str = "is_done";
-
 const TASK_PATH: &str = "/tasks";
 
 #[derive(Deserialize, IntoParams)]
@@ -24,7 +20,7 @@ const TASK_PATH: &str = "/tasks";
 pub struct TaskListQuery {
     /// Filter tasks by completion status. When omitted, all tasks are returned.
     #[param(example = true)]
-    pub is_done: bool,
+    pub is_done: Option<bool>,
 }
 
 /// `GET /tasks?done=<bool>` - lists tasks, optionally filtered by the `done` flag.
@@ -41,16 +37,7 @@ pub async fn tasks_list(
     State(pool): State<PgPool>,
     Query(params): Query<TaskListQuery>,
 ) -> ApiResult<Json<Vec<Task>>> {
-    let done = match params.get(params.is_done) {
-        Some(value) => match value.parse::<bool>() {
-            Ok(done) => Some(done),
-            Err(_) => {
-                warn!(filter = value, "invalid `done` filter ignored");
-                None
-            }
-        },
-        None => None,
-    };
+    let done = params.is_done;
 
     match repositories::tasks::list(&pool, done).await {
         Ok(tasks) => Ok(Json(tasks)),
@@ -62,6 +49,16 @@ pub async fn tasks_list(
 }
 
 /// `POST /tasks` - creates a task from the JSON payload.
+#[utoipa::path(
+  post,
+  path = TASK_PATH,
+  request_body = CreateTask,
+  responses(
+    (status = StatusCode::CREATED, description = "Task created.", body = Task),
+    (status = StatusCode::INTERNAL_SERVER_ERROR, description = "Internal server error."),
+  ),
+  tag = "tasks"
+)]
 pub async fn task_create(
     State(pool): State<PgPool>,
     Json(CreateTask { name }): Json<CreateTask>,
@@ -79,6 +76,17 @@ pub async fn task_create(
 }
 
 /// `GET /tasks/{id}` - returns a single task, or a 404 when missing.
+#[utoipa::path(
+  get,
+  path = "/tasks/{id}",
+  params(("id" = Uuid, Path, description = "Identifier of the task to fetch.")),
+  responses(
+    (status = StatusCode::OK, description = "Task found.", body = Task),
+    (status = StatusCode::NOT_FOUND, description = "Task not found."),
+    (status = StatusCode::INTERNAL_SERVER_ERROR, description = "Internal server error."),
+  ),
+  tag = "tasks"
+)]
 pub async fn task_info(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> ApiResult<Json<Task>> {
     match repositories::tasks::find_by_id(&pool, id).await {
         Ok(Some(task)) => Ok(Json(task)),
@@ -91,6 +99,17 @@ pub async fn task_info(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> ApiR
 }
 
 /// `DELETE /tasks/{id}` - soft-deletes a task, returning the archived row.
+#[utoipa::path(
+  delete,
+  path = "/tasks/{id}",
+  params(("id" = Uuid, Path, description = "Identifier of the task to delete.")),
+  responses(
+    (status = StatusCode::OK, description = "Task deleted.", body = Task),
+    (status = StatusCode::NOT_FOUND, description = "Task not found."),
+    (status = StatusCode::INTERNAL_SERVER_ERROR, description = "Internal server error."),
+  ),
+  tag = "tasks"
+)]
 pub async fn task_delete(
     State(pool): State<PgPool>,
     Path(id): Path<Uuid>,

@@ -16,7 +16,7 @@ pub struct Task {
 }
 
 /// Incoming payload accepted when creating a task.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct CreateTask {
     pub name: String,
 }
