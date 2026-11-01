@@ -9,7 +9,7 @@
 //! as `RUST_LOG` (e.g. `SERVER_LOG_LEVEL=info,Rust_REST_API_example=trace`).
 
 use std::env;
-
+use postgres::fallible_iterator::FallibleIterator;
 use tracing_subscriber::{
     filter::EnvFilter,
     fmt,
@@ -52,11 +52,17 @@ pub fn init_logging() {
     let formatter = if envs::environment() != DEVELOP_ENVIRONMENT {
         fmt::layer()
             .json()
+            .flatten_event(true) // "message" field at top level
+            .with_span_list(false)    // keep only the current span
             .with_file(true)
             .with_line_number(true)
             .boxed()
     } else {
-        fmt::layer().pretty().boxed()
+        fmt::layer()
+            .with_file(true)
+            .with_line_number(true)
+            .pretty()
+            .boxed()
     };
 
     tracing_subscriber::registry()

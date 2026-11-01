@@ -1,7 +1,7 @@
-use axum::{Router, routing::get};
+use axum::{Router, routing::get, http::Request,};
 use sqlx::PgPool;
 use tower_http::trace::{DefaultMakeSpan, DefaultOnResponse, TraceLayer};
-use tracing::Level;
+use tracing::{info, Level, Span};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -22,6 +22,16 @@ use crate::models::task::{CreateTask, Task};
 )]
 struct ApiDocs;
 
+fn requests_span(request: &Request<Body>) -> Span {
+    let request_id = uuid::Uuid::new_v4().to_string();
+    tracing::info_span!(
+        "HTTP request",
+        method = %request.method(),
+        path = %request.uri().path(),
+        request_id = %request_id,
+    );
+}
+
 pub fn create_router(pool: PgPool) -> Router {
     let openapi = ApiDocs::openapi();
     Router::new()
@@ -34,7 +44,7 @@ pub fn create_router(pool: PgPool) -> Router {
         )
         .layer(
             TraceLayer::new_for_http()
-                .make_span_with(DefaultMakeSpan::new().level(Level::INFO))
+                .make_span_with(requests_span)
                 .on_response(DefaultOnResponse::new().level(Level::INFO)),
         )
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/v1/openapi.json", openapi.clone()))
