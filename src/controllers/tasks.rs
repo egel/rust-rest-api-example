@@ -3,8 +3,10 @@ use std::collections::HashMap;
 use axum::Json;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
+use serde::Deserialize;
 use sqlx::PgPool;
 use tracing::{error, info, warn};
+use utoipa::IntoParams;
 use uuid::Uuid;
 
 use crate::models::task::{CreateTask, Task};
@@ -15,12 +17,31 @@ type ApiResult<T> = Result<T, (StatusCode, &'static str)>;
 
 const QUERY_PARAM_IS_DONE: &str = "is_done";
 
+const TASK_PATH: &str = "/tasks";
+
+#[derive(Deserialize, IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct TaskListQuery {
+    /// Filter tasks by completion status. When omitted, all tasks are returned.
+    #[param(example = true)]
+    pub is_done: bool,
+}
+
 /// `GET /tasks?done=<bool>` - lists tasks, optionally filtered by the `done` flag.
+#[utoipa::path(
+  get,
+  path = TASK_PATH,
+  params(TaskListQuery),
+  responses(
+    (status = StatusCode::OK, description = "List of all tasks.", body = Vec<Task>),
+  ),
+  tag = "tasks"
+)]
 pub async fn tasks_list(
     State(pool): State<PgPool>,
-    Query(params): Query<HashMap<String, String>>,
+    Query(params): Query<TaskListQuery>,
 ) -> ApiResult<Json<Vec<Task>>> {
-    let done = match params.get(QUERY_PARAM_IS_DONE) {
+    let done = match params.get(params.is_done) {
         Some(value) => match value.parse::<bool>() {
             Ok(done) => Some(done),
             Err(_) => {

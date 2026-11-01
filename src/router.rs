@@ -2,11 +2,22 @@ use axum::{Router, routing::get};
 use sqlx::PgPool;
 use tower_http::trace::{DefaultMakeSpan, DefaultOnResponse, TraceLayer};
 use tracing::Level;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 use crate::controllers::{health, root, tasks};
 
 /// Builds the application router with a database pool shared across handlers.
+#[derive(OpenApi)]
+#[openapi(
+    info(title = "Making API", version = "0.0.1"),
+    paths(tasks::tasks_list, tasks::task_create, tasks::tasks_update, tasks::tasks_delete),
+    components(schemas(Task)),
+)]
+struct ApiDocs;
+
 pub fn create_router(pool: PgPool) -> Router {
+    let openapi = OpenApi::openapi();
     Router::new()
         .route("/", get(root::root))
         .route("/health", get(health::health))
@@ -20,5 +31,6 @@ pub fn create_router(pool: PgPool) -> Router {
                 .make_span_with(DefaultMakeSpan::new().level(Level::INFO))
                 .on_response(DefaultOnResponse::new().level(Level::INFO)),
         )
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/v1/openapi.json", openapi.clone()))
         .with_state(pool)
 }
