@@ -11,7 +11,7 @@ use crate::models::task::{CreateTask, Task};
 /// Builds the application router with a database pool shared across handlers.
 #[derive(OpenApi)]
 #[openapi(
-    info(title = "Making API", version = "0.0.1"),
+    info(title = "Example REST API", version = "0.0.1"),
     paths(
         tasks::tasks_list,
         tasks::task_create,

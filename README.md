@@ -2,6 +2,8 @@
 
 Complete REST API example project in Rust with full OpenApi spec and tests. It uses dockerization (docker compose) for quick connection and database setup.
 
+![](docs/assets/swagger-api.png)
+
 ```sh
 # copy variables example and adjust
 cp .env.example .env
@@ -16,8 +18,8 @@ cargo build
 SERVER_ENVIRONMENT=develop cargo run
 ```
 
-> [TIP]
-> If `SERVER_ENVIRONMENT=develop` it will automatically load `.env` file.
+> [!TIP]
+> If `SERVER_ENVIRONMENT=develop` it will automatically load environment variables from `.env` file.
 
 ## Prerequisites
 
